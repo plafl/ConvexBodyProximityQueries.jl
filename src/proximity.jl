@@ -89,7 +89,7 @@ false
 ```
 """
 function collision_detection(p::Any, q::Any, init_dir::SVector{D, T}; max_iter=100) where {D, T}
-    collision, = gjk(p, q, init_dir, max_iter, Inf*oneunit(T), collision_detection_cond)
+    collision, = gjk(p, q, init_dir, max_iter, convert(T, Inf), collision_detection_cond)
     return collision
 end
 
