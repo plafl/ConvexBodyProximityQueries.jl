@@ -89,7 +89,7 @@ false
 ```
 """
 function collision_detection(p::Any, q::Any, init_dir::SVector{D, T}; max_iter=100) where {D, T}
-    collision, = gjk(p, q, init_dir, max_iter, convert(T, Inf), collision_detection_cond)
+    collision, = gjk(p, q, init_dir, max_iter, T(Inf), collision_detection_cond)
     return collision
 end
 
@@ -98,8 +98,8 @@ function gjk(p::Any, q::Any, init_dir::SVector{N, T}, max_iter::Int, atol::T, qu
     sz = 1
     collision = false
     distance_condition = false
-    ps = support(p, init_dir)
-    qs = support(q, -init_dir)
+    ps, pstate = support(p, init_dir)
+    qs, qstate = support(q, -init_dir)
     psimplex = insertcolumn(ps)
     qsimplex = insertcolumn(qs)
     dir = qs - ps
@@ -109,16 +109,17 @@ function gjk(p::Any, q::Any, init_dir::SVector{N, T}, max_iter::Int, atol::T, qu
         return true, dir, psimplex, qsimplex, sz
     end
 
-    ps = support(p, dir)
-    qs = support(q, -dir)
+    ps, pstate = support(p, dir, pstate)
+    qs, qstate = support(q, -dir, qstate)
+
     s = ps - qs
     while !distance_condition && !collision && !check_degeneracy(psimplex-qsimplex, s, sz)
         sz += 1
         psimplex = insertcolumn(psimplex, ps, sz)
         qsimplex = insertcolumn(qsimplex, qs, sz)
         psimplex, qsimplex, dir, collision, sz = findsimplex(psimplex, qsimplex, sz)
-        ps = support(p, dir)
-        qs = support(q, -dir)
+        ps, pstate = support(p, dir, pstate)
+        qs, qstate = support(q, -dir, qstate)
         s = ps - qs
         collision = query(dir, collision, params...)
         distance_condition = (s⋅(-dir)) ≥ ntol2 && (sum(abs2, dir) - s⋅(-dir)) ≤ atol^2
