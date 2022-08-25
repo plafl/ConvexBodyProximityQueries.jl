@@ -8,3 +8,7 @@ a StaticArray.
 function support(vertices::SMatrix, dir::SVector)
     @inbounds vertices[:, argmax(vertices'*dir)]
 end
+"""Default support init state is nothing"""
+support_init(x) = nothing
+"""Default stateless call for support function"""
+support(a, n, state) = (support(a, n), state)

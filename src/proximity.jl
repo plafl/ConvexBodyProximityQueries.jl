@@ -98,8 +98,10 @@ function gjk(p::Any, q::Any, init_dir::SVector{N, T}, max_iter::Int, atol::T, qu
     sz = 1
     collision = false
     distance_condition = false
-    ps, pstate = support(p, init_dir)
-    qs, qstate = support(q, -init_dir)
+    pstate = support_init(p)
+    qstate = support_init(q)
+    ps, pstate = support(p, init_dir, pstate)
+    qs, qstate = support(q, -init_dir, qstate)
     psimplex = insertcolumn(ps)
     qsimplex = insertcolumn(qs)
     dir = qs - ps
