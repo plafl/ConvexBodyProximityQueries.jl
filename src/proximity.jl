@@ -103,7 +103,7 @@ function gjk(p::Any, q::Any, init_dir::SVector{N, T}, max_iter::Int, atol::T, qu
     psimplex = insertcolumn(ps)
     qsimplex = insertcolumn(qs)
     dir = qs - ps
-    ntol2 = eps(T)*oneunit(T)^2 # numerical tolerance
+    ntol2 = eps(T)^2 # numerical tolerance
 
     if sum(abs2, dir) ≤ ntol2
         return true, dir, psimplex, qsimplex, sz
